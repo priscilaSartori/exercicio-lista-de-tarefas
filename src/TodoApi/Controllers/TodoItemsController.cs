@@ -75,12 +75,16 @@ namespace TodoApi.Controllers
       return BadRequest();
     }
 
-    [HttpPost("/add-todo")]
+    [HttpPost]
     public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItem todoItem)
     {
       if (_context.TodoItems == null)
       {
-        return Problem("Entity set 'TodoContext.TodoItems'  is null.");
+        return BadRequest("Entity set 'TodoContext.TodoItems'  is null.");
+      }
+      if (todoItem.Name == null)
+      {
+        return BadRequest("Entity set 'TodoContext.TodoItems'  is invalid.");
       }
       _context.TodoItems.Add(todoItem);
       await _context.SaveChangesAsync();
