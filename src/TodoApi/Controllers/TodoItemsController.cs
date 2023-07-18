@@ -51,28 +51,22 @@ namespace TodoApi.Controllers
     {
       if (id != todoItem.Id)
       {
-        return Ok();
+        return BadRequest();
       }
 
       _context.Entry(todoItem).State = EntityState.Modified;
-
-      try
-      {
-        await _context.SaveChangesAsync();
-      }
-      catch (DbUpdateConcurrencyException)
       {
         if (!TodoItemExists(id))
         {
-          return BadRequest();
+          return NotFound();
         }
-        else
-        {
-          throw;
-        }
+        // else
+        // {
+        //   throw;
+        // }
       }
 
-      return BadRequest();
+      return Ok();
     }
 
     [HttpPost]
