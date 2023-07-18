@@ -88,23 +88,22 @@ namespace TodoApi.Controllers
       return CreatedAtAction("GetTodoItem", new { id = todoItem.Id }, todoItem);
     }
 
-    [HttpDelete("/delete-item/{id}")]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTodoItem(long id)
     {
       if (_context.TodoItems == null)
       {
-        return Ok();
+        return NotFound();
       }
       var todoItem = await _context.TodoItems.FindAsync(id);
       if (todoItem == null)
       {
-        return Ok();
+        return NotFound();
       }
 
       _context.TodoItems.Remove(todoItem);
       await _context.SaveChangesAsync();
-
-      return NotFound();
+      return NoContent();
     }
 
     private bool TodoItemExists(long id)

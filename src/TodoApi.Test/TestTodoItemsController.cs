@@ -17,21 +17,21 @@ public class TestTodoItemsController : IClassFixture<WebApplicationFactory<Progr
     {
       builder.ConfigureServices(services =>
           {
-          services.AddDbContext<TodoContext>(options =>
-              {
-              options.UseInMemoryDatabase("TodoList");
-            });
+            services.AddDbContext<TodoContext>(options =>
+                {
+                  options.UseInMemoryDatabase("TodoList");
+                });
 
-          var sp = services.BuildServiceProvider();
+            var sp = services.BuildServiceProvider();
 
-          var scope = sp.CreateScope();
-          var scopedServices = scope.ServiceProvider;
-          var db = scopedServices.GetRequiredService<TodoContext>();
-          db.Database.EnsureDeleted();
-          db.Database.EnsureCreated();
-          db.TodoItems.AddRange(GetTodoTestList());
-          db.SaveChanges();
-        });
+            var scope = sp.CreateScope();
+            var scopedServices = scope.ServiceProvider;
+            var db = scopedServices.GetRequiredService<TodoContext>();
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+            db.TodoItems.AddRange(GetTodoTestList());
+            db.SaveChanges();
+          });
     }).CreateClient();
   }
 
@@ -44,12 +44,16 @@ public class TestTodoItemsController : IClassFixture<WebApplicationFactory<Progr
     response.StatusCode.Should().Be(expectedStatusCode);
   }
 
-  [Theory]
-  [InlineData("/api/TodoItems/1", HttpStatusCode.NoContent)]
-  [InlineData("/api/TodoItems/5", HttpStatusCode.NotFound)]
   public async Task TestDeleteRouteStatusCode(string path, HttpStatusCode expectedStatusCode)
   {
-    throw new NotImplementedException();
+    var response = await _client.DeleteAsync(path);
+    response.StatusCode.Should().Be(expectedStatusCode);
+
+    if (expectedStatusCode == HttpStatusCode.OK)
+    {
+      var response2 = await _client.GetAsync(path);
+      response2.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
   }
 
 
